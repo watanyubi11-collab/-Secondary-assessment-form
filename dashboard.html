@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard ผลประเมินครู</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Prompt", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg,#fdfbfb,#ebedee);
+    }
+    h1 { text-align:center; color:#444; }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    canvas {
+      width: 100% !important;
+      height: 400px !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 Dashboard ผลประเมินครู</h1>
+
+    <div class="card">
+      <h2>ค่าเฉลี่ยต่อครู/วิชา</h2>
+      <canvas id="chartSubjects"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>ค่าเฉลี่ยต่อห้อง</h2>
+      <canvas id="chartHomerooms"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>ค่าเฉลี่ยต่อชั้นเรียน</h2>
+      <canvas id="chartGrades"></canvas>
+    </div>
+  </div>
+
+<script>
+const API_URL = "<?= ScriptApp.getService().getUrl() ?>"; 
+// << ใช้ฟังก์ชันนี้แทนการพิมพ์ URL เอง จะได้อัตโนมัติ
+
+async function loadData() {
+  try {
+    const res = await fetch(API_URL + "?mode=summary");
+    const json = await res.json();
+
+    renderChart("chartSubjects",
+      json.subjects.map(x => x.teacher_subject),
+      json.subjects.map(x => x.avg),
+      "ครู/วิชา"
+    );
+
+    renderChart("chartHomerooms",
+      json.homerooms.map(x => x.homeroom),
+      json.homerooms.map(x => x.avg),
+      "ห้องเรียน"
+    );
+
+    renderChart("chartGrades",
+      json.grades.map(x => x.grade),
+      json.grades.map(x => x.avg),
+      "ระดับชั้น"
+    );
+  } catch(e) {
+    alert("โหลดข้อมูลไม่ได้ ❌");
+    console.error(e);
+  }
+}
+
+function renderChart(canvasId, labels, data, label) {
+  new Chart(document.getElementById(canvasId), {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: label,
+        data: data,
+        backgroundColor: "rgba(54,162,235,0.6)",
+        borderColor: "rgba(54,162,235,1)",
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: true }
+      },
+      scales: {
+        y: { beginAtZero: true, max: 5 }
+      }
+    }
+  });
+}
+
+loadData();
+</script>
+</body>
+</html>

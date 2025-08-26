@@ -1,0 +1,67 @@
+<----- เสร็จแล้ว ------>
+
+function doPost(e) {
+  try {
+    const sheetId = "1W7mvXJZerwARD4S2bTEJJxWiFdv9kNAdaOtb0Gn8wRs"; 
+    const ss = SpreadsheetApp.openById(sheetId);
+    const sheet = ss.getSheetByName("Responses"); 
+
+    if (!sheet) {
+      return ContentService.createTextOutput(
+        JSON.stringify({ status: "error", message: "❌ ไม่พบชีตชื่อ Responses" })
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    const data = e.parameter;
+    const student_id = data.student_id ? data.student_id.trim() : "";
+    const grade = data.grade || "";
+    const homeroom = data.homeroom || "";
+    const homeroom_score = data.homeroom_score || "";
+    const subjects = JSON.parse(data.subjects || "[]");
+    const comment = data.comment || "";
+
+    if (!student_id) {
+      return ContentService.createTextOutput(
+        JSON.stringify({ status: "error", message: "❌ กรุณากรอกรหัสนักเรียน" })
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // ✅ ดึงข้อมูล StudentID ที่เคยบันทึก
+    let idCol = [];
+    const lastRow = sheet.getLastRow();
+    if (lastRow > 1) { 
+      idCol = sheet.getRange(2, 2, lastRow - 1, 1).getValues().flat();
+    }
+
+    if (idCol.includes(student_id)) {
+      return ContentService.createTextOutput(
+        JSON.stringify({ status: "error", message: "⚠️ รหัสนี้เคยส่งแล้ว" })
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // ✅ เตรียมข้อความรวมวิชา
+    const subjectText = subjects.map(s => `${s.subject}(${s.teacher}:${s.score})`).join(", ");
+
+    // ✅ แถวข้อมูลใหม่
+    const row = [
+      new Date(),       // Timestamp
+      student_id,       // รหัสนักเรียน
+      grade,            // ชั้น
+      homeroom,         // ครูประจำชั้น
+      homeroom_score,   // คะแนนครูประจำชั้น
+      subjectText,      // รายวิชา (ครู:คะแนน)
+      comment           // ข้อเสนอแนะ
+    ];
+
+    sheet.appendRow(row);
+
+    return ContentService.createTextOutput(
+      JSON.stringify({ status: "success", message: "✅ ส่งแบบประเมินสำเร็จ" })
+    ).setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    return ContentService.createTextOutput(
+      JSON.stringify({ status: "error", message: "❌ " + err.message })
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
+}

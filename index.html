@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>แบบประเมินคุณครู</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root{
+      --pink:#e91e63; --pink-soft:#fff0f6; --brand:#ff66a6; --brand2:#ffb6f0;
+      --text:#444; --card:#fff; --bg:#fff5fa; --border:#e9dbe3;
+    }
+    *{box-sizing:border-box}
+    body{font-family:"Prompt",system-ui,-apple-system,Segoe UI,Roboto; background:var(--bg); margin:0}
+    .container{
+      max-width:780px; margin:24px auto; background:var(--card);
+      border-radius:22px; padding:22px; box-shadow:0 8px 20px rgba(0,0,0,.08);
+    }
+    h1{margin:0 0 10px; text-align:center; color:var(--pink)}
+    p.desc{text-align:center; color:#666; margin:0 0 18px}
+    label{display:block; margin-top:14px; color:var(--text); font-weight:600}
+    input,select,textarea{
+      width:100%; padding:12px 12px; border-radius:14px; border:1px solid var(--border);
+      font-size:15px; outline:none; background:#fff;
+    }
+    textarea{min-height:90px; resize:vertical}
+    .subjects{margin-top:18px}
+    .subject-box{
+      background:var(--pink-soft); border:1px solid var(--border);
+      border-radius:18px; padding:14px; margin-bottom:16px;
+      box-shadow:0 3px 10px rgba(0,0,0,.06);
+    }
+    .subject-title{display:flex; align-items:center; gap:8px; color:#ad1457; font-weight:700; margin-bottom:8px}
+
+    /* cute checkbox */
+    .cute-check{display:inline-flex; align-items:center; gap:8px}
+    .cute-check input{display:none}
+    .checkmark{
+      width:22px; height:22px; border-radius:50%; border:2px solid #f06292;
+      background:#ffe4ec; display:inline-block; position:relative; cursor:pointer; transition:.2s;
+    }
+    .cute-check input:checked + .checkmark{
+      background:#f06292 url('https://cdn-icons-png.flaticon.com/512/833/833472.png') no-repeat center/14px;
+      transform:scale(1.08);
+    }
+
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width:640px){ .row{grid-template-columns:1fr} }
+
+    button{
+      margin-top:22px; width:100%; padding:14px; border:0; border-radius:16px;
+      background:linear-gradient(90deg,var(--brand),var(--brand2)); color:#fff; font-weight:800; font-size:16px;
+      box-shadow:0 6px 16px rgba(255,102,166,.35); cursor:pointer; transition:.2s;
+    }
+    button:hover{transform:translateY(-1px)}
+    .small{font-size:12px; color:#777; margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📋 แบบประเมินคุณครู ม.ปลาย</h1>
+    <p class="desc">รหัสนักเรียนส่งได้เพียงครั้งเดียว</p>
+
+    <form id="evalForm" novalidate>
+      <label>📌 รหัสนักเรียน *</label>
+      <input type="text" id="student_id" required placeholder="เช่น C00001" />
+
+      <label>🏫 ชั้นเรียน *</label>
+      <select id="grade" required>
+        <option value="">-- เลือกชั้น --</option>
+        <option>ม.4</option><option>ม.5</option><option>ม.6</option>
+      </select>
+
+      <label>👩‍🏫 ครูประจำชั้น *</label>
+      <select id="homeroom" required>
+        <option value="">-- เลือกครูประจำชั้น --</option>
+        <option>ครูก้อย</option>
+
+      </select>
+
+      <label>⭐ คะแนนครูประจำชั้น (1–10) *</label>
+      <select id="homeroom_score" required>
+        <option value="">-- เลือกคะแนน --</option>
+        <script>for(let i=1;i<=10;i++)document.write(`<option value="${i}">${i}</option>`)</script>
+      </select>
+
+      <div class="subjects">
+        <h2 style="color:#c2185b">📖 ประเมินรายวิชา (เลือกตามวิชาที่เรียน)</h2>
+
+        <!-- วิชา: คณิตศาสตร์ -->
+        <div class="subject-box" data-subject="คณิตศาสตร์">
+          <div class="subject-title">
+            <label class="cute-check">
+              <input type="checkbox" class="subject-check">
+              <span class="checkmark"></span>
+            </label>
+            คณิตศาสตร์
+          </div>
+          <div class="row">
+            <div>
+              <label>ครูผู้สอน</label>
+              <select class="teacher">
+                <option value="">-- เลือกครู --</option>
+                <option>ครูแนท</option>
+                <option>ครูโก้ย</option>
+              </select>
+            </div>
+            <div>
+              <label>คะแนน (1–10)</label>
+              <select class="score">
+                <option value="">-- เลือกคะแนน --</option>
+                <script>for(let i=1;i<=10;i++)document.write(`<option>${i}</option>`)</script>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- วิชา: ฟิสิกส์ -->
+        <div class="subject-box" data-subject="ฟิสิกส์">
+          <div class="subject-title">
+            <label class="cute-check">
+              <input type="checkbox" class="subject-check">
+              <span class="checkmark"></span>
+            </label>
+            ฟิสิกส์
+          </div>
+          <div class="row">
+            <div>
+              <label>ครูผู้สอน</label>
+              <select class="teacher">
+                <option value="">-- เลือกครู --</option>
+                <option>ครูเปรียว</option>
+                <option>ครูเต๋า</option>
+              </select>
+            </div>
+            <div>
+              <label>คะแนน (1–10)</label>
+              <select class="score">
+                <option value="">-- เลือกคะแนน --</option>
+                <script>for(let i=1;i<=10;i++)document.write(`<option>${i}</option>`)</script>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- วิชา: เคมี -->
+        <div class="subject-box" data-subject="เคมี">
+          <div class="subject-title">
+            <label class="cute-check">
+              <input type="checkbox" class="subject-check">
+              <span class="checkmark"></span>
+            </label>
+            เคมี
+          </div>
+          <div class="row">
+            <div>
+              <label>ครูผู้สอน</label>
+              <select class="teacher">
+                <option value="">-- เลือกครู --</option>
+               <option>ครูมะปราง</option>
+
+              </select>
+            </div>
+            <div>
+              <label>คะแนน (1–10)</label>
+              <select class="score">
+                <option value="">-- เลือกคะแนน --</option>
+                <script>for(let i=1;i<=10;i++)document.write(`<option>${i}</option>`)</script>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- วิชา: ชีวะ -->
+        <div class="subject-box" data-subject="ชีวะ">
+          <div class="subject-title">
+            <label class="cute-check">
+              <input type="checkbox" class="subject-check">
+              <span class="checkmark"></span>
+            </label>
+            ชีวะ
+          </div>
+          <div class="row">
+            <div>
+              <label>ครูผู้สอน</label>
+              <select class="teacher">
+                <option value="">-- เลือกครู --</option>
+                <option>ครูเน็ท</option>
+              </select>
+            </div>
+            <div>
+              <label>คะแนน (1–10)</label>
+              <select class="score">
+                <option value="">-- เลือกคะแนน --</option>
+                <script>for(let i=1;i<=10;i++)document.write(`<option>${i}</option>`)</script>
+              </select>
+            </div>
+          </div>
+        </div>
+
+                <!-- วิชา: ภาษาอังกฤษ -->
+        <div class="subject-box" data-subject="ภาษาอังกฤษ ">
+          <div class="subject-title">
+            <label class="cute-check">
+              <input type="checkbox" class="subject-check">
+              <span class="checkmark"></span>
+            </label>
+            ภาษาอังกฤษ
+          </div>
+          <div class="row">
+            <div>
+              <label>ครูผู้สอน</label>
+              <select class="teacher">
+                <option value="">-- เลือกครู --</option>
+                <option>ครูแนท</option>
+                <option>ครูฝ้าย</option>
+              </select>
+            </div>
+            <div>
+              <label>คะแนน (1–10)</label>
+              <select class="score">
+                <option value="">-- เลือกคะแนน --</option>
+                <script>for(let i=1;i<=10;i++)document.write(`<option>${i}</option>`)</script>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <label>✍️ ข้อเสนอแนะ/ข้อปรับปรุง</label>
+      <textarea id="comment" placeholder="พิมพ์ข้อเสนอแนะ..."></textarea>
+
+      <div class="small">* จำเป็นต้องกรอก กดส่งแบบประเมินแล้วรอสักครู่</div>
+      <button type="submit">ส่งแบบประเมิน</button>
+    </form>
+  </div>
+
+  <script>
+    // 👉 ใส่ URL Web App ของคุณ
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwU-5ueqBwutNE-9r8Pst2SBNx4zEFq2pYh0F6YpNGTUfAfCI6HjWMq6t0y409G-IfZ/exec";
+
+    document.getElementById("evalForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const student_id = document.getElementById("student_id").value.trim();
+      const grade = document.getElementById("grade").value.trim();
+      const homeroom = document.getElementById("homeroom").value.trim();
+      const homeroom_score = document.getElementById("homeroom_score").value.trim();
+      const comment = document.getElementById("comment").value.trim();
+
+      // ตรวจข้อมูลพื้นฐาน
+      if (!student_id || !grade || !homeroom || !homeroom_score) {
+        Swal.fire("กรอกข้อมูลไม่ครบ", "กรุณากรอกช่องที่มีเครื่องหมาย * ให้ครบ", "warning");
+        return;
+      }
+
+      // ดึงวิชาที่ติ๊ก พร้อมครูและคะแนน
+      const subjects = [];
+      document.querySelectorAll(".subject-box").forEach(box => {
+        const checked = box.querySelector(".subject-check").checked;
+        if (checked) {
+          const subject = box.getAttribute("data-subject");
+          const teacher = box.querySelector(".teacher").value.trim();
+          const score = box.querySelector(".score").value.trim();
+          if (!teacher || !score) {
+            subjects.push({ subject, teacher, score, _invalid:true });
+          } else {
+            subjects.push({ subject, teacher, score });
+          }
+        }
+      });
+
+      // อย่างน้อย 1 วิชา
+      if (subjects.length === 0) {
+        Swal.fire("กรุณาเลือกวิชา", "เลือกอย่างน้อย 1 วิชา และระบุครูกับคะแนน", "info");
+        return;
+      }
+      // ทุกวิชาที่เลือกต้องมีครูและคะแนน
+      if (subjects.some(s => s._invalid)) {
+        Swal.fire("ข้อมูลรายวิชาไม่ครบ", "กรุณาเลือกครูและคะแนนให้ครบทุกวิชาที่เลือก", "warning");
+        return;
+      }
+
+      // ส่งข้อมูล
+      const body = new URLSearchParams({
+        student_id, grade, homeroom, homeroom_score,
+        subjects: JSON.stringify(subjects),
+        comment
+      });
+
+      try {
+        const res = await fetch(WEB_APP_URL, { method: "POST", body });
+        const json = await res.json();
+
+        if (json.status === "success") {
+          await Swal.fire("สำเร็จ ✨", json.message || "ส่งแบบประเมินสำเร็จ", "success");
+          e.target.reset();
+          // ยกเลิกติ๊กทุกวิชา
+          document.querySelectorAll(".subject-check").forEach(cb => cb.checked = false);
+        } else {
+          Swal.fire("ไม่สามารถส่งได้", json.message || "โปรดลองใหม่ภายหลัง", "error");
+        }
+      } catch (err) {
+        Swal.fire("เชื่อมต่อไม่ได้", "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้", "error");
+      }
+    });
+    
+     // 🚫 ป้องกัน F12, Ctrl+Shift+I, Ctrl+U
+    document.onkeydown = function(e) {
+      if (e.keyCode == 123) { return false; } // F12
+      if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }
+      if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
+    };
+
+    // 🚫 ป้องกันคลิกขวา
+    document.addEventListener("contextmenu", function(e){
+      e.preventDefault();
+    }, false);
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
